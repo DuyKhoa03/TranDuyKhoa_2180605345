@@ -12,7 +12,7 @@ namespace TranDuyKhoa_2180605345.Repositories
         }
         public async Task<IEnumerable<Product>> GetAllAsync()
         {
-            return await _context.Products.Include(X => X.Category).ToListAsync();
+            return await _context.Products.Include(x => x.Category).ToListAsync();
         }
         public async Task<Product> GetByIdAsync(int id)
         {

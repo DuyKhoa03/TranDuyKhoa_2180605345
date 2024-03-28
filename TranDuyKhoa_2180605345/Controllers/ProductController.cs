@@ -9,6 +9,7 @@ namespace TranDuyKhoa_2180605345.Controllers
     {
         private readonly IProductRepository _productRepository;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly IProductImageRepository _productImageRepository;
         public ProductController(IProductRepository productRepository, ICategoryRepository categoryRepository)
         {
             _productRepository = productRepository;
@@ -29,7 +30,7 @@ namespace TranDuyKhoa_2180605345.Controllers
         }
         // Xử lý thêm sản phẩm mới
         [HttpPost]
-        public async Task<IActionResult> Add(Product product,IFormFile imageUrl)
+        public async Task<IActionResult> Add(Product product,IFormFile imageUrl,List<IFormFile> imageUrls)
         {
             if (ModelState.IsValid)
             {
@@ -37,6 +38,18 @@ namespace TranDuyKhoa_2180605345.Controllers
                 {
                     // Lưu hình ảnh đại diện
                     product.ImageUrl = await SaveImage(imageUrl);
+                }
+                if(imageUrls!=null)
+                {
+                    //Lưu các hình ảnh
+                    foreach (var file in imageUrls)
+                    {
+                        // Lưu các hình ảnh khác
+                        var productImage = new ProductImage();
+                        productImage.ProductId = product.Id;
+                        productImage.Url = await SaveImage(file);
+                        await _productImageRepository.AddAsync(productImage);   
+                    }
                 }
                 await _productRepository.AddAsync(product);
                 return RedirectToAction(nameof(Index));
@@ -50,6 +63,10 @@ namespace TranDuyKhoa_2180605345.Controllers
         public async Task<IActionResult> Display(int id)
         {
             var product = await _productRepository.GetByIdAsync(id);
+            var category = await _categoryRepository.GetByIdAsync(product.CategoryId);
+            ViewBag.Category = category.Name;
+            //var images = await _productImageRepository.GetByProductIdAsync(product.Id);
+            //ViewBag.Images = images;
             if (product == null)
             {
                 return NotFound();
@@ -65,15 +82,13 @@ namespace TranDuyKhoa_2180605345.Controllers
                 return NotFound();
             }
             var categories = await _categoryRepository.GetAllAsync();
-            ViewBag.Categories = new SelectList(categories, "Id", "Name",
-
-            product.CategoryId);
-
+            ViewBag.Categories = new SelectList(categories, "Id", "Name", product.CategoryId);
+            ViewBag.Image = product.ImageUrl;
             return View(product);
         }
         // Xử lý cập nhật sản phẩm
         [HttpPost]
-        public async Task<IActionResult> Update(int id, Product product,IFormFile imageUrl)
+        public async Task<IActionResult> Update(int id, Product product,IFormFile imageUrl, List<IFormFile> imageUrls)
         {
             if (id != product.Id)
             {
@@ -86,8 +101,8 @@ namespace TranDuyKhoa_2180605345.Controllers
                     // Lưu hình ảnh đại diện
                     product.ImageUrl = await SaveImage(imageUrl);
                 }
-                await _productRepository.UpdateAsync(product);
-                return RedirectToAction(nameof(Index));
+                    await _productRepository.UpdateAsync(product);
+                    return RedirectToAction(nameof(Index));
             }
             return View(product);
         }
@@ -95,6 +110,8 @@ namespace TranDuyKhoa_2180605345.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var product = await _productRepository.GetByIdAsync(id);
+            var category = await _categoryRepository.GetByIdAsync(product.CategoryId);
+            ViewBag.Category = category.Name;
             if (product == null)
             {
                 return NotFound();
