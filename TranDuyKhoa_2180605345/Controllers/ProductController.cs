@@ -9,7 +9,6 @@ namespace TranDuyKhoa_2180605345.Controllers
     {
         private readonly IProductRepository _productRepository;
         private readonly ICategoryRepository _categoryRepository;
-        private readonly IProductImageRepository _productImageRepository;
         public ProductController(IProductRepository productRepository, ICategoryRepository categoryRepository)
         {
             _productRepository = productRepository;
@@ -39,19 +38,16 @@ namespace TranDuyKhoa_2180605345.Controllers
                     // Lưu hình ảnh đại diện
                     product.ImageUrl = await SaveImage(imageUrl);
                 }
-                if(imageUrls!=null)
+                var productImage = new ProductImage();
+
+                if (imageUrls != null)
                 {
+
                     //Lưu các hình ảnh
-                    foreach (var file in imageUrls)
-                    {
-                        // Lưu các hình ảnh khác
-                        var productImage = new ProductImage();
-                        productImage.ProductId = product.Id;
-                        productImage.Url = await SaveImage(file);
-                        await _productImageRepository.AddAsync(productImage);   
-                    }
+                    
                 }
                 await _productRepository.AddAsync(product);
+                //await _productImageRepository.AddAsync(productImage);
                 return RedirectToAction(nameof(Index));
             }
             // Nếu ModelState không hợp lệ, hiển thị form với dữ liệu đã nhập

@@ -6,7 +6,6 @@ namespace TranDuyKhoa_2180605345.Repositories
     public class EFProductImageRepository : IProductImageRepository
     {
         private readonly ApplicationDbContext _context;
-
         public EFProductImageRepository(ApplicationDbContext context)
         {
             _context = context;
@@ -18,10 +17,6 @@ namespace TranDuyKhoa_2180605345.Repositories
         public async Task<ProductImage> GetByIdAsync(int id)
         {
             return await _context.ProductImages.FindAsync(id);
-        }
-        public async Task<IEnumerable<ProductImage>> GetByProductIdAsync(int id)
-        {
-            return await _context.ProductImages.Where(x=>x.ProductId==id).ToListAsync();
         }
         public async Task AddAsync(ProductImage productImage)
         {
@@ -39,5 +34,6 @@ namespace TranDuyKhoa_2180605345.Repositories
             _context.ProductImages.Remove(productImage);
             await _context.SaveChangesAsync();
         }
+
     }
 }
