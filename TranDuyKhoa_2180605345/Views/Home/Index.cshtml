@@ -1,6 +1,7 @@
 ﻿@model IEnumerable<TranDuyKhoa_2180605345.Models.Product>
 @{
     ViewData["Title"] = "Home Page";
+    int numOfQuantity = 1;
 }
 <section class="py-2">
     <div class="container px-4 px-lg-5 mt-5">
@@ -20,12 +21,11 @@
                                 <span>Price: </span>
                                 <p class="mx-3">@item.Price.ToString("#,##0") Vnđ</p>
                             </div>
-                            <a>
-                                <button class="btn btn-outline-dark">
 
-                                    <i class="bi-cart-fill me-1"></i> Add to Cart
-                                </button>
-                            </a>
+                            <a asp-controller="ShoppingCart" asp-action="AddToCart" asp-route-productId="@item.Id" 
+                            asp-route-quantity="@numOfQuantity">
+                                <button class="btn btn-outline-dark"> <i class="bi-cart-fill me-1"></i>Add to cart</button>
+                        </a>
                         </div>
                     </div>
                 </div>
